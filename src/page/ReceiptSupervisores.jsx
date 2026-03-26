@@ -1,3 +1,4 @@
+import { CardWithFormReceiptObservados } from "@/components/Comprobante/CardWithFormReceiptObservados";
 import { CardWithFormReceiptReportSupervisores } from "@/components/Comprobante/CardWithFormReceiptReportSupervisores";
 import { CardWithFormReceiptSupervisores } from "@/components/Comprobante/CardWithFormReceiptSupervisores";
 import { Separator } from "@/components/ui/separator";
@@ -14,22 +15,27 @@ export default function ReceiptSupervisores() {
         </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 px-4 pt-0">
-        <div className="flex justify-center items-center min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min flex-col">
-          {/* Logo */}
-          <img
-            src="/logoCRCG.png"
-            alt="Logo CRCG"
-            className="w-60 h-auto mb-4"
-          />
+        <div className="flex flex-1 flex-col rounded-xl bg-muted/50 p-4">
+          {/* Logo centrado */}
+          <div className="flex justify-center mb-4">
+            <img
+              src="/logoCRCG.png"
+              alt="Logo CRCG"
+              className="w-60 h-auto"
+            />
+          </div>
 
           {/* Tabs */}
-          <Tabs defaultValue="receipt" className="w-[400px] sm:w-[1300px]">
-            <TabsList className="grid w-full grid-cols-2">
+          <Tabs defaultValue="receipt" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="receipt">
                 Comprobantes Banca 
               </TabsTrigger>
               <TabsTrigger value="receipt-report">
                 Generación de Reporte
+              </TabsTrigger>
+              <TabsTrigger value="receipt-observados">
+                Comprobantes Observados
               </TabsTrigger>
             </TabsList>
             <TabsContent value="receipt">
@@ -37,6 +43,9 @@ export default function ReceiptSupervisores() {
             </TabsContent>
             <TabsContent value="receipt-report">
               <CardWithFormReceiptReportSupervisores />
+            </TabsContent>
+            <TabsContent value="receipt-observados">
+              <CardWithFormReceiptObservados />
             </TabsContent>
           </Tabs>
         </div>

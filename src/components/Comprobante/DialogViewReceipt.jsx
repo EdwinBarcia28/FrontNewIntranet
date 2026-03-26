@@ -31,7 +31,7 @@ export function DialogViewReceipt({ data, open, onClose }) {
         <Separator className="my-4" />
 
         {/* INFO PRINCIPAL */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
           <div>
             <p className="text-muted-foreground">Identificación</p>
             <p className="font-semibold">{data.identificacion}</p>
@@ -50,6 +50,11 @@ export function DialogViewReceipt({ data, open, onClose }) {
           <div>
             <p className="text-muted-foreground">Fecha de Pago</p>
             <p className="font-semibold">{data.fechaComprobante}</p>
+          </div>
+
+          <div>
+            <p className="text-muted-foreground">Institucion de Pago</p>
+            <p className="font-semibold">{data.terminal}</p>
           </div>
         </div>
 

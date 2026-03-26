@@ -212,7 +212,7 @@ export function DataTableReceiptSupervisores({ data }) {
 
   return (
     <>
-      <div className="w-full max-w-[1300px] mx-auto">
+      <div className="w-full">
         <div className="rounded-md border overflow-x-auto">
           <Table className="min-w-[900px]">
             <TableHeader>

@@ -213,17 +213,16 @@ export const reverseComprobanteBanco = async (comprobante, token) => {
 
 export const verificarComprobanteGrm = async (comprobante, token) => {
   try {
-    const response = await axiosInstance.get(
+    const response = await axiosInstance.post(
       "/Comprobante/verificar-comprobante",
+      comprobante,
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        params: {
-          comprobante: comprobante, 
-        },
       }
     );
+    
     return response.data;
   } catch (error) {
     console.log(`Error al registrar el Conductor: ${error}`);
@@ -237,6 +236,24 @@ export const consultarComprobanteGeneral = async (comprobante, token) => {
   try {
     const response = await axiosInstance.post(
       "/Comprobante/consultar-comprobante-general",
+      comprobante,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(`Error al registrar el Conductor: ${error}`);
+    throw error;
+  }
+};
+
+export const consultarComprobanteConsolidado = async (comprobante, token) => {
+  try {
+    const response = await axiosInstance.post(
+      "/Comprobante/consultar-comprobante-consolidado",
       comprobante,
       {
         headers: {
@@ -292,6 +309,42 @@ export const editarComprobante = async (comprobante, token) => {
   try {
     const response = await axiosInstance.post(
       "/Comprobante/edicion-beneficiario",
+      comprobante,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(`Error al registrar el Conductor: ${error}`);
+    throw error;
+  }
+};
+
+export const addComprobante = async (comprobante, token) => {
+  try {
+    const response = await axiosInstance.post(
+      "/Comprobante/editar-comprobante-observacion",
+      comprobante,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(`Error al registrar el Conductor: ${error}`);
+    throw error;
+  }
+};
+
+export const liberarComprobante = async (comprobante, token) => {
+  try {
+    const response = await axiosInstance.post(
+      "/Comprobante/liberar-comprobante-observacion",
       comprobante,
       {
         headers: {

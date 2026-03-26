@@ -14,38 +14,40 @@ export default function Receipt() {
           <Separator orientation="vertical" className="mr-2 h-4" />
         </div>
       </header>
-      <div className="flex flex-1 flex-col gap-4 px-4 pt-0">
-        <div className="flex justify-center items-center min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min flex-col">
-          {/* Logo */}
-          <img
-            src="/logoCRCG.png"
-            alt="Logo CRCG"
-            className="w-60 h-auto mb-4"
-          />
 
-          {/* Tabs */}
-          <Tabs defaultValue="receipt" className="w-[400px] sm:w-[1300px]">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="receipt">
+      <div className="flex flex-1 flex-col gap-4 px-4 pt-0">
+        <div className="flex flex-1 flex-col rounded-xl bg-muted/50 p-4">
+          
+          {/* Logo centrado */}
+          <div className="flex justify-center mb-4">
+            <img
+              src="/logoCRCG.png"
+              alt="Logo CRCG"
+              className="w-60 h-auto"
+            />
+          </div>
+
+          {/* Tabs ocupan TODO el ancho */}
+          <Tabs defaultValue="receipt" className="w-full">
+            <TabsList className="flex w-full">
+              <TabsTrigger value="receipt" className="flex-1">
                 Consulta Comprobantes
               </TabsTrigger>
-              {/* <TabsTrigger value="receipt-grm">
-                Bandeja Comprobantes
-              </TabsTrigger> */}
-              <TabsTrigger value="receipt-report">
+
+              <TabsTrigger value="receipt-report" className="flex-1">
                 Generación de Reporte
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="receipt">
+
+            <TabsContent value="receipt" className="w-full">
               <CardWithFormReceipt />
             </TabsContent>
-            {/* <TabsContent value="receipt-grm">
-              <CardWithFormReceiptGrm />
-            </TabsContent> */}
-            <TabsContent value="receipt-report">
+
+            <TabsContent value="receipt-report" className="w-full">
               <CardWithFormReceiptReport />
             </TabsContent>
           </Tabs>
+
         </div>
       </div>
     </>

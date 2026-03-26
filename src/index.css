@@ -90,3 +90,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Ocultar botón "Open file" del visor PDF */
+button[data-testid="open__button"],
+.rpv-core__minimal-button[data-testid="open__button"] {
+    display: none !important;
+}

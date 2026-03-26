@@ -1,6 +1,6 @@
 
 import { CardWithFormDespacho } from "@/components/Inventario/Despacho/CardWithFormDespacho";
-import { CardWithFormSearchDespacho } from "@/components/Inventario/Despacho/CardWithFormSearchDespacho";
+// import { CardWithFormSearchDespacho } from "@/components/Quioscos/CardWithFormQuiosco";
 import { CardWithFormSearchSolicitudDespacho } from "@/components/Inventario/Despacho/CardWithFormSearchSolicitudDespacho";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -30,9 +30,9 @@ export default function Despacho() {
               <TabsTrigger value="solicitudes">
                 Consultar solicitudes de despachos
               </TabsTrigger>
-              <TabsTrigger value="consultar">
+              {/* <TabsTrigger value="consultar">
                 Consultar despachos 
-              </TabsTrigger>
+              </TabsTrigger> */}
               <TabsTrigger value="despacho">
                 Registrar despachos
               </TabsTrigger>
@@ -40,9 +40,9 @@ export default function Despacho() {
             <TabsContent value="solicitudes">
               <CardWithFormSearchSolicitudDespacho />
             </TabsContent>
-            <TabsContent value="consultar">
+            {/* <TabsContent value="consultar">
               <CardWithFormSearchDespacho />
-            </TabsContent>
+            </TabsContent> */}
             <TabsContent value="despacho">
               <CardWithFormDespacho />
             </TabsContent>

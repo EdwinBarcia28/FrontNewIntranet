@@ -12,7 +12,7 @@ async function cargarImagenBase64(url) {
   });
 }
 
-export async function generarPdfReceiptReport(data, intranet, grm, filtros = {}) {
+export async function generarPdfReceiptReport(data, intranet, grm, libre, filtros = {}) {
   const doc = new jsPDF("p", "pt", "letter");
 
   const logoBase64 = await cargarImagenBase64("/logoCRCG.png");
@@ -51,7 +51,7 @@ export async function generarPdfReceiptReport(data, intranet, grm, filtros = {})
   ];
 
   const headersGrm = [
-    ["Número", "Identificación", "Nombre", "Servicio", "Fecha Registro"],
+    ["Número", "Identificación", "Nombre", "Servicio", "Oficina","Fecha Registro"],
   ];
 
   // -----------------------------------------
@@ -63,6 +63,32 @@ export async function generarPdfReceiptReport(data, intranet, grm, filtros = {})
     doc.text("Comprobantes Consultados", 40, yActual);
 
     const body = data.map((item) => [
+      item.numeroComprobante,
+      item.identificacion,
+      item.ciudadano,
+      item.servicio,
+      item.oficina,
+      item.fechaComprobante,
+    ]);
+
+    autoTable(doc, {
+      startY: yActual + 15,
+      head: headers,
+      body: body,
+      theme: "grid",
+      styles: { fontSize: 9, halign: "center" },
+      headStyles: { fillColor: [30, 64, 175], textColor: 255 },
+    });
+
+    yActual = doc.lastAutoTable.finalY + 30;
+  }
+
+  if (libre.length > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Comprobantes libres", 40, yActual);
+
+    const body = libre.map((item) => [
       item.numeroComprobante,
       item.identificacion,
       item.ciudadano,
@@ -125,6 +151,7 @@ export async function generarPdfReceiptReport(data, intranet, grm, filtros = {})
       item.identificacion,
       item.ciudadano,
       item.servicio,
+      item.oficina,
       item.fechaComprobante,
     ]);
 
@@ -140,5 +167,5 @@ export async function generarPdfReceiptReport(data, intranet, grm, filtros = {})
     yActual = doc.lastAutoTable.finalY + 30;
   }
 
-  doc.save("reporte-recibos-grm.pdf");
+  return doc.output("blob");
 }

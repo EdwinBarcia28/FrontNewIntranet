@@ -18,14 +18,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { verificarComprobanteGrm } from "@/services/comprobantes";
+import { addComprobante, verificarComprobanteGrm } from "@/services/comprobantes";
 import { useAuthStore } from "@/store/auth";
 import { toast } from "react-toastify";
 import { DialogViewReceiptRegister } from "./DialogViewReceiptRegister";
+import { DialogAddObservacionesComprobantes } from "./DialogAddObservacionesComprobantes";
+import { useUIStore } from "@/store/ui";
 
 export function DataTableReceiptGrm({ data, onRefresh }) {
+  const { token , dataUser } = useAuthStore();
+  const { setGlobalLoading } = useUIStore();
 
-  const { token } = useAuthStore();
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedViewReceiptRegister, setSelectedReceiptRegister] = useState(null);
 
@@ -38,7 +41,15 @@ export function DataTableReceiptGrm({ data, onRefresh }) {
 
         const handleCheck = async () => {
           try {
-            const res = await verificarComprobanteGrm(data.numeroComprobante, token);
+            setGlobalLoading(true, `Verificando comprobante #${data.numeroComprobante} con C.I:${data.identificacionCiudadano}`);
+
+            const payload = {
+              Id: data.id,
+              Comprobante: data.numeroComprobante,
+              Cedula: data.identificacionCiudadano
+            }
+
+            const res = await verificarComprobanteGrm(payload, token);
 
             if (res.error === 0) {
               if (onRefresh)
@@ -77,13 +88,58 @@ export function DataTableReceiptGrm({ data, onRefresh }) {
               progress: undefined,
               theme: "dark",
             });
+          } finally {
+            //setLoadingReceiptReportConsolidado(false);
+            setGlobalLoading(false);
           }
         };
 
         const handleConsultar = () => {
-          setOpenDialog(true); 
+          setOpenDialog(true);
           setSelectedReceiptRegister(data);
         };
+
+
+        const handleAnular = async (id, comprobante, observacion) => {
+          try{
+            setGlobalLoading(true, `Observando comprobante #${data.numeroComprobante} con C.I:${data.identificacionCiudadano}`);
+            const payload = {
+              id: Number(id),
+              comprobante: Number(comprobante),
+              usuario: dataUser ? dataUser.nombreUsuario : "Desconocido",
+              observacion: observacion || ""
+            };
+
+            try {
+              const res = await addComprobante(payload, token);
+
+              if (res.error === 0) {
+                if (onRefresh) onRefresh();
+                toast.success(res.mensaje || "Se mando ");
+              } else {
+                toast.error(res.mensaje || "Error al anular solicitud");
+              }
+            } catch (error) {
+              toast.error(`Error inesperado: ${error.message || error}`);
+            }
+          }catch (error) {
+            return toast.error(`Error inesperado: ${error}`, {
+              position: "top-right",
+              autoClose: 4000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+            });
+          } finally {
+            //setLoadingReceiptReportConsolidado(false);
+            setGlobalLoading(false);
+          }
+          
+        };
+
 
 
 
@@ -109,10 +165,12 @@ export function DataTableReceiptGrm({ data, onRefresh }) {
                   >
                     <Eye size={18} />
                   </button>
+
+                  <DialogAddObservacionesComprobantes handleClickObservacionesComprobantes={(observacion) => handleAnular(data.id, data.numeroComprobante,observacion)} /> 
                 </>
               )}
 
-              {data.estado !== "Pendiente" && (
+              {data.estado == "USADO" && (
                 <>
                   <button
                     variant="ghost"
@@ -122,6 +180,36 @@ export function DataTableReceiptGrm({ data, onRefresh }) {
                   >
                     <Eye size={18} />
                   </button>
+
+                  <DialogAddObservacionesComprobantes handleClickObservacionesComprobantes={(observacion) => handleAnular(data.id, data.numeroComprobante,observacion)} /> 
+                </>
+              )}
+
+              {data.estado == "Observado" && (
+                <>
+                  <button
+                    variant="ghost"
+                    onClick={handleConsultar}
+                    className="text-blue-600 hover:text-blue-800 ml-4"
+                    title="Consultar"
+                  >
+                    <Eye size={18} />
+                  </button>
+                </>
+              )}
+
+              {data.estado == "Finalizado" && (
+                <>
+                  <button
+                    variant="ghost"
+                    onClick={handleConsultar}
+                    className="text-blue-600 hover:text-blue-800 ml-4"
+                    title="Consultar"
+                  >
+                    <Eye size={18} />
+                  </button>
+
+                  <DialogAddObservacionesComprobantes handleClickObservacionesComprobantes={(observacion) => handleAnular(data.id, data.numeroComprobante,observacion)} /> 
                 </>
               )}
 
@@ -181,14 +269,24 @@ export function DataTableReceiptGrm({ data, onRefresh }) {
       cell: ({ row }) => <div>{row.getValue("oficina")}</div>,
     },
     {
-      accessorKey: "usuario",
+      accessorKey: "usuarioConsulta",
       headerLabel: "Usuario de Registro",
       header: ({ column }) => (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Usuario de Registro<ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <div>{row.getValue("usuario")}</div>,
+      cell: ({ row }) => <div>{row.getValue("usuarioConsulta")}</div>,
+    },
+    {
+      accessorKey: "fechaRegistro",
+      headerLabel: "Fecha de Registro",
+      header: ({ column }) => (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Fecha de Registro<ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("fechaRegistro")}</div>,
     }
   ];
 
@@ -217,7 +315,7 @@ export function DataTableReceiptGrm({ data, onRefresh }) {
 
   return (
     <>
-      <div className="w-full max-w-[1300px] mx-auto">
+      <div className="w-full">
         <div className="rounded-md border overflow-x-auto">
           <Table className="min-w-[900px]">
             <TableHeader>

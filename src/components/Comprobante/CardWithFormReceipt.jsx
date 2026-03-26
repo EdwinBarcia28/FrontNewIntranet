@@ -34,9 +34,21 @@ export const CardWithFormReceipt = () => {
   const [searchReceipt, setSearchReceipt] = useState("");
   const [searchIdentificacion, setSearchIdentificacion] = useState("");
 
-  const handleFilterSearch = (event) => {
-    setFilterSearch(event);
+  const handleFilterSearch = (value) => {
+    setFilterSearch(value);
+
+    // 🔥 Limpia TODO cuando cambia el tipo
+    setDataReceipt([]);
+    setDataReceiptBandejaRegister([]);
+
+    setSearchReceipt("");
+    setSearchIdentificacion("");
+    setSearchReceiptRegister("");
+
+    setLoadingReceipt(false);
+    setLoadingReceiptRegister(false);
   };
+
 
 
   const handleChangeSearchReceipt = (event) => {
@@ -153,6 +165,7 @@ export const CardWithFormReceipt = () => {
 
   const handleFilterReceiptRegister = (event) => {
     setDataReceiptBandejaRegister([]);
+    setDataReceipt([]);
     setSearchReceiptRegister("");
     setFilterReceiptRegister(event);
   };
@@ -258,11 +271,11 @@ export const CardWithFormReceipt = () => {
 
 
   return (
-    <Card className="w-full px-4 md:px-10 max-w-[1400px] mx-auto">
+    <Card className="w-full px-4 md:px-8">
       <CardHeader>
         <CardTitle>Consulta de Comprobantes</CardTitle>
         <CardDescription>
-          En esta opción podra consultar los comprobantes los comprobantes de la banca virtual , si al consultar sale un mensaje que el comprobante ya fue usado o consultado
+          En esta opción podra consultar los comprobantes  de la banca virtual , si al consultar sale un mensaje que el comprobante ya fue usado o consultado
           debe escoger la opcion comprobantes registrados , para verificar el estado en el que esta dicho comprobante y quien lo consulto previamente
         </CardDescription>
 

@@ -20,16 +20,16 @@ export const CardWithFormReceiptSupervisores = () => {
   const { dataUser, selectEstablishments , token } = useAuthStore();
   const [loadingReceipt, setLoadingReceipt] = useState(false);
   const [dataReceipt, setDataReceipt] = useState([]);
-  const [searchReceipt, setSearchReceipt] = useState("");
+  //const [searchReceipt, setSearchReceipt] = useState("");
   const [searchIdentificacion, setSearchIdentificacion] = useState("");
 
 
-  const handleChangeSearchReceipt = (event) => {
-    let value = event.target.value;
-    value = value.replace(/\D/g, "");
-    value = value.slice(0, 8);
-    setSearchReceipt(value);
-  };
+  // const handleChangeSearchReceipt = (event) => {
+  //   let value = event.target.value;
+  //   value = value.replace(/\D/g, "");
+  //   value = value.slice(0, 8);
+  //   setSearchReceipt(value);
+  // };
 
   const handleChangeSearchIdentification= (event) => {
     let value = event.target.value;
@@ -55,23 +55,23 @@ export const CardWithFormReceiptSupervisores = () => {
       });
     }
 
-    if (searchReceipt.length > 8) {
-      setDataReceipt([]);
-      return toast.error("El numero de comprobante debe tener máximo 8 caracteres.", {
-        position: "top-right",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
-    }
+    // if (searchReceipt.length > 8) {
+    //   setDataReceipt([]);
+    //   return toast.error("El numero de comprobante debe tener máximo 8 caracteres.", {
+    //     position: "top-right",
+    //     autoClose: 4000,
+    //     hideProgressBar: false,
+    //     closeOnClick: true,
+    //     pauseOnHover: true,
+    //     draggable: true,
+    //     progress: undefined,
+    //     theme: "dark",
+    //   });
+    // }
     setLoadingReceipt(true);
 
     const requestComprobante = {
-      Comprobante: Number(searchReceipt),
+      //Comprobante: Number(searchReceipt),
       Cedula: searchIdentificacion?.toString() || "",
       Oficina: selectEstablishments || "",
       Usuario: dataUser ? dataUser.nombreUsuario : "Desconocido",
@@ -124,7 +124,7 @@ export const CardWithFormReceiptSupervisores = () => {
   }
 
   return (
-    <Card className="w-full px-4 md:px-10 max-w-[1400px] mx-auto">
+    <Card className="w-full px-4 md:px-8">
       <CardHeader>
         <CardTitle>Consulta de Comprobantes</CardTitle>
         <CardDescription>
@@ -140,18 +140,6 @@ export const CardWithFormReceiptSupervisores = () => {
               name="searchIdentificacion"
               value={searchIdentificacion}
               onChange={handleChangeSearchIdentification}
-              className="w-full"
-            />
-          </div>
-
-      
-          <div className="md:col-span-3 flex flex-col space-y-1.5">
-            <Label htmlFor="searchReceipt">Numero Comprobante</Label>
-            <Input
-              id="searchReceipt"
-              name="searchReceipt"
-              value={searchReceipt}
-              onChange={handleChangeSearchReceipt}
               className="w-full"
             />
           </div>

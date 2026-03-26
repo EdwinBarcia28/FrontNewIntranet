@@ -28,14 +28,13 @@ function formatearFecha(fecha) {
   return `${mm}-${dd}-${yyyy} ${hh}:${min}:${ss}`;
 }
 
-export async function generatePdfReceiptReportSupervisor(data, filtros = {}) {
-  const doc = new jsPDF({
-    orientation: "landscape",
-    unit: "mm",
-    format: [353, 250], // B4 horizontal
-  });
 
-
+export async function generarPdfReceiptReportConsolidado(data, filtros = {}) {
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: [353, 250], // B4 horizontal
+    });
 
   const pageWidth = doc.internal.pageSize.getWidth();
 
@@ -70,12 +69,8 @@ export async function generatePdfReceiptReportSupervisor(data, filtros = {}) {
   doc.text(new Date().toLocaleString(), metaX + 40, metaY);
 
   metaY += 5;
-  doc.text(`Fecha desde:`, metaX, metaY);
-  doc.text(filtros.fechaDesde || "-", metaX + 40, metaY);
-
-  metaY += 5;
-  doc.text(`Fecha hasta:`, metaX, metaY);
-  doc.text(filtros.fechaHasta || "-", metaX + 40, metaY);
+  doc.text(`Fecha consulta:`, metaX, metaY);
+  doc.text(filtros.fecha || "-", metaX + 40, metaY);
 
   metaY += 5;
   doc.text(`Oficina:`, metaX, metaY);
@@ -89,7 +84,7 @@ export async function generatePdfReceiptReportSupervisor(data, filtros = {}) {
      LÍNEA SEPARADORA
   ====================================================== */
   doc.setLineWidth(0.3);
-  doc.line(8, 37, pageWidth - 8, 37);
+  doc.line(8, 34, pageWidth - 8, 34);
 
   /* ======================================================
      SECCIÓN
@@ -109,7 +104,7 @@ export async function generatePdfReceiptReportSupervisor(data, filtros = {}) {
     "Cédula",
     "Ciudadano",
     "Oficina",
-    "Operador",
+    "Usuario Tramite",
     "Fecha Trámite",
     "Plataforma",
     "Usuario Consulta",
@@ -172,12 +167,14 @@ export async function generatePdfReceiptReportSupervisor(data, filtros = {}) {
   ====================================================== */
   // const pageCount = doc.getNumberOfPages();
   // for (let i = 1; i <= pageCount; i++) {
-  //   const pageWidth = doc.internal.pageSize.getWidth();
-  //   const pageHeight = doc.internal.pageSize.getHeight();
-
-  //   doc.setFontSize(9);
-  //   doc.text(`Página ${pageCount}`, pageWidth - 20, pageHeight - 10);
-
+  //   doc.setPage(i);
+  //   doc.setFontSize(8);
+  //   doc.text(
+  //     `Página ${i} de ${pageCount}`,
+  //     pageWidth - 15,
+  //     205,
+  //     { align: "right" }
+  //   );
   // }
 
   return doc.output("blob");

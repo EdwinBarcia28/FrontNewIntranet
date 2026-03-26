@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { ArrowUpDown, Check, FileText } from "lucide-react";
+import { ArrowUpDown, Check, Eye, Trash2 } from "lucide-react";
 import {
   flexRender,
   getCoreRowModel,
@@ -18,11 +18,107 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
- 
-export function DataTableReportReceipt({ data }) {
+import { DialogViewReceiptRegisterObservados } from "./DialogViewReceiptRegisterObservados";
+import { toast } from "react-toastify";
+import { useUIStore } from "@/store/ui";
+import { liberarComprobante } from "@/services/comprobantes";
+import { useAuthStore } from "@/store/auth";
+
+export function DataTableReceiptObservados({ data, onRefresh }) {
+  const { setGlobalLoading } = useUIStore();
+  const { token, dataUser } = useAuthStore();
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedViewReceiptRegister, setSelectedReceiptRegister] = useState(null);
+
+  const handleLiberarComprobante = async (comprobante) => {
+    try {
+      const payload = {
+        id: comprobante.id,
+        secuencial: comprobante.numeroComprobante,
+        usuario: dataUser ? dataUser.nombreUsuario : "Desconocido",
+        identificacion: comprobante.identificacionCiudadano
+      };
+
+      setGlobalLoading(true, `Liberando comprobante # ${comprobante.numeroComprobante} de la C.I: ${comprobante.identificacionCiudadan}`);
+
+      const res = await liberarComprobante(payload, token);
+
+
+      if (res.error === 0) {
+        if (onRefresh)
+          onRefresh();
+        return toast.success(res.mensaje, {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      } else {
+        return toast.error(`Error inesperado: ${res.message}`, {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        }
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("❌ Error al liberar el comprobante", { id: "liberar" });
+      throw error;
+    } finally {
+      setOpenDialog(false);
+      setSelectedReceiptRegister(null);
+      setGlobalLoading(false);
+    }
+  };
 
 
   const columns = [
+    {
+      id: "acciones",
+      header: () => <div className="text-center">Acciones</div>,
+      cell: ({ row }) => {
+        const data = row.original;
+
+
+        const handleConsultar = () => {
+          setOpenDialog(true);
+          setSelectedReceiptRegister(data);
+        };
+
+
+
+
+        return (
+          <>
+            <div className="flex justify-center items-center gap-2">
+              {data.estado === "Observado" && (
+                <>
+                  <Button
+                    variant="ghost"
+                    onClick={handleConsultar}
+                    className="text-red-600 hover:text-red-800"
+                    title="Anular"
+                  >
+                    <Trash2 size={18} />
+                  </Button>
+                </>
+              )}
+
+            </div>
+          </>
+        );
+      },
+    },
     {
       accessorKey: "numeroComprobante",
       headerLabel: "Num. de Comprobante",
@@ -34,34 +130,34 @@ export function DataTableReportReceipt({ data }) {
       cell: ({ row }) => <div>{row.getValue("numeroComprobante")}</div>,
     },
     {
-      accessorKey: "identificacion",
+      accessorKey: "identificacionCiudadano",
       headerLabel: "Identificación de Ciudadano",
       header: ({ column }) => (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Identificación de Ciudadano<ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <div>{row.getValue("identificacion")}</div>,
+      cell: ({ row }) => <div>{row.getValue("identificacionCiudadano")}</div>,
     },
     {
-      accessorKey: "ciudadano",
+      accessorKey: "nombreCiudadano",
       headerLabel: "Nombre Ciudadano",
       header: ({ column }) => (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Nombre Ciudadano<ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <div>{row.getValue("ciudadano")}</div>,
+      cell: ({ row }) => <div>{row.getValue("nombreCiudadano")}</div>,
     },
     {
-      accessorKey: "servicio",
+      accessorKey: "servicioPagado",
       headerLabel: "Servicio Pagado",
       header: ({ column }) => (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Servicio Pagado<ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <div>{row.getValue("servicio")}</div>,
+      cell: ({ row }) => <div>{row.getValue("servicioPagado")}</div>,
     },
     {
       accessorKey: "oficina",
@@ -74,21 +170,21 @@ export function DataTableReportReceipt({ data }) {
       cell: ({ row }) => <div>{row.getValue("oficina")}</div>,
     },
     {
-      accessorKey: "fechaComprobante",
-      headerLabel: "Fecha de Registro",
+      accessorKey: "usuario",
+      headerLabel: "Usuario de Registro",
       header: ({ column }) => (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          Fecha de Registro<ArrowUpDown className="ml-2 h-4 w-4" />
+          Usuario de Registro<ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <div>{row.getValue("fechaComprobante")}</div>,
+      cell: ({ row }) => <div>{row.getValue("usuario")}</div>,
     }
   ];
 
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
- 0
+
   const table = useReactTable({
     data,
     columns,
@@ -97,7 +193,7 @@ export function DataTableReportReceipt({ data }) {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(), 
+    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     enableMultiRowSelection: false,
     state: {
@@ -110,7 +206,7 @@ export function DataTableReportReceipt({ data }) {
 
   return (
     <>
-      <div className="w-full max-w-[1300px] mx-auto">
+      <div className="w-full">
         <div className="rounded-md border overflow-x-auto">
           <Table className="min-w-[900px]">
             <TableHeader>
@@ -148,43 +244,22 @@ export function DataTableReportReceipt({ data }) {
           </Table>
         </div>
       </div>
-      <div className="flex justify-center mt-4 space-x-2">
-        {/* Botón anterior */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Anterior
-        </Button>
 
-        {/* Números de páginas */}
-        {Array.from({ length: table.getPageCount() }, (_, i) => (
-          <Button
-            key={i}
-            variant={i === table.getState().pagination.pageIndex ? "default" : "outline"}
-            size="sm"
-            onClick={() => table.setPageIndex(i)}
-          >
-            {i + 1}
-          </Button>
-        ))}
+      {openDialog && (
+        <DialogViewReceiptRegisterObservados
+          data={selectedViewReceiptRegister}
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          onLiberar={handleLiberarComprobante}
+        />
+      )}
 
-        {/* Botón siguiente */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Siguiente
-        </Button>
-      </div>
+
     </>
+
   );
 }
 
-DataTableReportReceipt.propTypes = {
+DataTableReceiptObservados.propTypes = {
   data: PropTypes.array
 };

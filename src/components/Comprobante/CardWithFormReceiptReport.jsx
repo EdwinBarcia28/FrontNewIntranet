@@ -11,162 +11,296 @@ import { useAuthStore } from "@/store/auth";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FileText, Loader, Search } from "lucide-react";
-import { consultarComprobanteGeneral } from "@/services/comprobantes";
+import { FileSpreadsheet, FileText, Loader, Search } from "lucide-react";
+import { consultarComprobanteConsolidado, } from "@/services/comprobantes";
 import { DataTableReportReceipt } from "./DataTableReportReceipt";
 import { DataTableReportIntranet } from "./DataTableReportIntranet";
 import { DataTableReportGrm } from "./DataTableReportGrm";
-import { generarPdfReceiptReport } from "@/utils/generatePdfReceiptReport";
+//import { generarPdfReceiptReport } from "@/utils/generatePdfReceiptReport";
+//import { FileText } from "lucide-react";
+//import { generarPdfReceiptReport } from "@/utils/generatePdfReceiptReport";
+import { ReceiptPdfViewer } from "./ReceiptPdfViewer";
+import { generarPdfReceiptReportConsolidado } from "@/utils/generatePdfReceiptReportConsolidado";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { generateExcelReceiptReport } from "@/utils/generateExcelReceiptReport";
+import { useUIStore } from "@/store/ui";
 
 export const CardWithFormReceiptReport = () => {
+  const { setGlobalLoading } = useUIStore();
 
   const { selectEstablishments, dataUser, token } = useAuthStore();
+  //const [pdfBlob, setPdfBlob] = useState(null);
+  const [pdfBlobConsolidado, setPdfBlobConsolidado] = useState(null);
+  const [dataReporte, setDataReporte] = useState([]);
 
-  const [loadingReceiptReport, setLoadingReceiptReport] = useState(false);
-  const [dataReceiptBandeja, setDataReceiptBandeja] = useState([]);
-  const [dataReceiptIntranet, setDataReceiptIntranet] = useState([]);
-  const [dataReceiptGrm, setDataReceiptGrm] = useState([]);
-  const [fechaGeneracion, setFechaGeneracion] = useState("");
+  //const [filterSearch, setFilterSearch] = useState("1");
 
-  const handleBuscar = async (event) => {
+
+  //const [loadingReceiptReport, setLoadingReceiptReport] = useState(false);
+  //const [fechaGeneracion, setFechaGeneracion] = useState("");
+
+  const [loadingReceiptReportConsolidado, setLoadingReceiptReportConsolidado] = useState(false);
+  const [fechaGeneracionConsolidado, setFechaGeneracionConsolidado] = useState("");
+
+  // const handleFilterSearch = (event) => {
+  //   setFilterSearch(event);
+  // };
+
+  // const handleBuscar = async (event) => {
+  //   event.preventDefault();
+
+  //   const requestComprobante = {
+  //     FechaComprobante: fechaGeneracion,
+  //     Usuario: dataUser ? dataUser.nombreUsuario : "Desconocido",
+  //   };
+
+  //   setLoadingReceiptReport(true);
+
+  //   const responseReceipt = await consultarComprobanteGeneral(
+  //     requestComprobante,
+  //     token
+  //   );
+
+  //   setLoadingReceiptReport(false);
+
+  //   if (!responseReceipt) {
+  //     return toast.error("Comunicación con el servidor fallida");
+  //   }
+
+  //   if (responseReceipt.error === 1) {
+  //     return toast.error(responseReceipt.mensaje);
+  //   }
+
+
+  //   toast.success(responseReceipt.mensaje);
+
+
+
+  //   const blob = await generarPdfReceiptReport(
+  //     responseReceipt.comprobantes,
+  //     responseReceipt.intranet,
+  //     responseReceipt.grm,
+  //     {
+  //       fecha: fechaGeneracion,
+  //       oficina: selectEstablishments || "",
+  //       usuario: dataUser?.nombreUsuario || "Desconocido",
+  //     }
+  //   );
+
+  //   setPdfBlob(blob);
+  // };
+
+  const handleBuscarConsolidado = async (event) => {
     event.preventDefault();
 
-    const requestComprobante = {
-      FechaComprobante: fechaGeneracion,
-      //Oficina: selectEstablishments || "",
-      Usuario: dataUser ? dataUser.nombreUsuario : "Desconocido",
-    };
+    setGlobalLoading(true, `Generando reporte con fecha ${fechaGeneracionConsolidado}...`);
+    setLoadingReceiptReportConsolidado(true);
 
-    setLoadingReceiptReport(true);
-    const responseReceipt = await consultarComprobanteGeneral(requestComprobante, token);
+    try {
+      const requestComprobante = {
+        FechaComprobante: fechaGeneracionConsolidado,
+        Usuario: dataUser ? dataUser.nombreUsuario : "Desconocido",
+      };
 
-    if (!responseReceipt) {
-      setLoadingReceiptReport(false);
-      return toast.error("Comunicación con el servidor fallida");
-    }
+      const responseReceipt = await consultarComprobanteConsolidado(
+        requestComprobante,
+        token
+      );
 
-    setLoadingReceiptReport(false);
+      if (!responseReceipt) {
+        toast.error("Comunicación con el servidor fallida");
+        return;
+      }
 
-    if (responseReceipt.error === 1) {
-      return toast.error(responseReceipt.mensaje);
-    } else {
-      setDataReceiptBandeja(responseReceipt.comprobantes);
-      setDataReceiptIntranet(responseReceipt.intranet);
-      setDataReceiptGrm(responseReceipt.grm);
+      if (responseReceipt.error === 1) {
+        toast.error(responseReceipt.mensaje);
+        return;
+      }
+
       toast.success(responseReceipt.mensaje);
+
+      setDataReporte(responseReceipt.consolidado);
+
+      const blob = await generarPdfReceiptReportConsolidado(
+        responseReceipt.consolidado,
+        {
+          fecha: fechaGeneracionConsolidado,
+          oficina: selectEstablishments || "",
+          usuario: dataUser?.nombreUsuario || "Desconocido",
+        }
+      );
+
+      setPdfBlobConsolidado(blob);
+    } catch (error) {
+      toast.error(`Error inesperado: ${error.message || error}`);
+    } finally {
+      setLoadingReceiptReportConsolidado(false);
+      setGlobalLoading(false);
     }
-
-
   };
 
+
+  const handleDescargarExcel = () => {
+    if (!dataReporte || dataReporte.length === 0) {
+      return toast.info("Primero genera el reporte para poder exportar a Excel");
+    }
+
+    generateExcelReceiptReport(dataReporte, {
+      fecha: fechaGeneracionConsolidado,
+      usuario: dataUser?.nombreUsuario || "Desconocido",
+    });
+  };
+
+
+
+
   return (
-    <Card className="w-full max-w-[1400px] mx-auto px-6 py-4">
+    <Card className="w-full px-4 md:px-8">
       <CardHeader>
         <CardTitle>
           Reporte de Comprobantes Generados
         </CardTitle>
 
         <CardDescription>
-          En esta opción podrá consultar los comprobantes consultados en la banca, utilizados en el GRM y la intranet.
+          En esta opción podrá consultar los comprobantes utilizados en el todos los sistemas de la corporacion.
         </CardDescription>
 
-        <br />
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+        {/* <div className="mt-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
           <div className="md:col-span-3 flex flex-col space-y-1.5">
-            <Label className="text-sm mb-1">Fecha Comprobante</Label>
-            <Input
-              type="date"
-              className="w-52 h-10"
-              value={fechaGeneracion}
-              onChange={(e) => setFechaGeneracion(e.target.value)}
-            />
-          </div>
-
-          <div className="md:col-span-1 flex items-end">
-            <Button
-              onClick={handleBuscar}
-              disabled={loadingReceiptReport}
-              className="h-10"
+            <Label htmlFor="filterDriver">Tipo de Consulta</Label>
+            <Select
+              id="filterDeclarante"
+              name="filterDeclarante"
+              value={filterSearch}
+              onValueChange={handleFilterSearch}
             >
-              {loadingReceiptReport ? (
-                <Loader className="animate-spin" size={18} />
-              ) : (
-                <Search size={18} />
-              )}
-            </Button>
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccione un Filtro" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">Tramites Detallados</SelectItem>
+                <SelectItem value="2">Consulta Consolidados </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </div>
+        </div> */}
+
+        <br />
+        {/* {Number(filterSearch) === 1 && (
+          <>
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+              <div className="md:col-span-3 flex flex-col space-y-1.5">
+                <Label className="text-sm mb-1">Fecha Comprobante</Label>
+                <Input
+                  type="date"
+                  className="w-52 h-10"
+                  value={fechaGeneracion}
+                  onChange={(e) => setFechaGeneracion(e.target.value)}
+                />
+              </div>
+
+              <div className="md:col-span-1 flex items-end">
+                <Button
+                  onClick={handleBuscar}
+                  disabled={loadingReceiptReport}
+                  className="h-10"
+                >
+                  {loadingReceiptReport ? (
+                    <Loader className="animate-spin" size={18} />
+                  ) : (
+                    <Search size={18} />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </>
+        )} */}
+
+
+        <>
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+            <div className="md:col-span-3 flex flex-col space-y-1.5">
+              <Label className="text-sm mb-1">Fecha Comprobante</Label>
+              <Input
+                type="date"
+                className="w-52 h-10"
+                value={fechaGeneracionConsolidado}
+                onChange={(e) => setFechaGeneracionConsolidado(e.target.value)}
+              />
+            </div>
+
+            {/* <div className="md:col-span-1 flex items-end">
+                <Button
+                  onClick={handleBuscarConsolidado}
+                  disabled={loadingReceiptReportConsolidado}
+                  className="h-10"
+                >
+                  {loadingReceiptReportConsolidado ? (
+                    <Loader className="animate-spin" size={18} />
+                  ) : (
+                    <Search size={18} />
+                  )}
+                </Button>
+              </div> */}
+
+            <div className="col-span-12 md:col-span-2 flex justify-end gap-2">
+              <Button
+                onClick={handleBuscarConsolidado}
+                disabled={loadingReceiptReportConsolidado}
+                className="h-10 px-8"
+              >
+                {loadingReceiptReportConsolidado ? (
+                  <Loader className="animate-spin" size={18} />
+                ) : (
+                  <>
+                    <Search size={18} className="mr-2" />
+                    Buscar
+                  </>
+                )}
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10"
+                onClick={handleDescargarExcel}
+                disabled={!dataReporte || dataReporte.length === 0}
+              >
+                <FileSpreadsheet size={18} className="mr-2" />
+                Excel
+              </Button>
+            </div>
+
+          </div>
+        </>
+
       </CardHeader>
 
 
       {/* TABLA */}
       <CardContent className="mt-6 overflow-x-auto">
-        {(dataReceiptBandeja.length > 0 ||
-          dataReceiptIntranet.length > 0 ||
-          dataReceiptGrm.length > 0) && (
-            <>
-              <div className="flex justify-between items-center mb-4">
-                <h6 className="font-semibold leading-none tracking-tight">
-                  Comprobantes Registrados
-                </h6>
+        <div className="w-full">
+          {/* {Number(filterSearch) === 1 && ( */}
+          {/* <> */}
+          {/* VISOR */}
+          {/* {pdfBlob && <ReceiptPdfViewer pdfBlob={pdfBlob} />} */}
+          {/* </> */}
+          {/* )} */}
 
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2"
-                  onClick={() =>
-                    generarPdfReceiptReport(
-                      dataReceiptBandeja,
-                      dataReceiptIntranet,
-                      dataReceiptGrm,
-                      {
-                        fecha: fechaGeneracion,
-                        oficina: selectEstablishments || "",
-                        usuario: dataUser ? dataUser.nombreUsuario : "Desconocido",
-                      }
-                    )
-                  }
-                >
-                  <FileText size={18} />
-                  Exportar a PDF
-                </Button>
-              </div>
-            </>
-          )}
-
-
-        {/* TABLA PRINCIPAL BANCADA */}
-        {dataReceiptBandeja.length > 0 && (
           <>
-            <DataTableReportReceipt
-              data={dataReceiptBandeja}
-              intranet={dataReceiptIntranet}
-              grm={dataReceiptGrm}
-              filtros={{
-                fecha: fechaGeneracion,
-                oficina: selectEstablishments || "",
-                usuario: dataUser ? dataUser.nombreUsuario : "Desconocido",
-              }}
-            />
-            <br />
+            {/* VISOR */}
+            {pdfBlobConsolidado && <ReceiptPdfViewer pdfBlob={pdfBlobConsolidado} />}
           </>
-        )}
-
-        {/* TABLA INTRANET */}
-        {dataReceiptIntranet.length > 0 && (
-          <>
-            <DataTableReportIntranet data={dataReceiptIntranet} />
-            <br />
-          </>
-        )}
-
-        {/* TABLA GRM */}
-        {dataReceiptGrm.length > 0 && (
-          <>
-            <DataTableReportGrm data={dataReceiptGrm} />
-            <br />
-          </>
-        )}
+        </div>
       </CardContent>
     </Card>
   );
 };
+
+

@@ -6,12 +6,14 @@ import Menu from "./page/Menu";
 //import "./App.css";
 import { ProtectedRoute } from "./page/ProtectedRoute";
 import { RedirectAuth } from "./page/RedirectAuth";
+import { GlobalLoadingOverlay } from "./components/GlobalLoadingOverlay";
 //import { RedirectAuth } from "./page/RedirectAuth ";
 // import { RedirectEstablishments } from "./page/RedirectEstablishments ";
 
 function App() {
   return (
     <>
+      <GlobalLoadingOverlay />
       <Routes>
          <Route element={<RedirectAuth />}>
           <Route path="/" element={<Login />} />

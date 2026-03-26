@@ -13,6 +13,7 @@ import SolicitudDespacho from "./SolicitudDespacho";
 import IngresoStock from "./IngresoStock";
 import EdicionReceipt from "./EdicionReceipt";
 import ReceiptSupervisores from "./ReceiptSupervisores";
+import Certificado from "./Certificado";
 // import Product from "./IdRoot/Product";
 // import Client from "./IdRoot/Client";
 // import Driver from "./IdRoot/Driver";
@@ -44,6 +45,7 @@ function Menu() {
           <Route path="/inventario/despacho-cedulas" element={<Despacho />} />
           <Route path="/inventario/solicitud-despacho-cedulas" element={<SolicitudDespacho />} />
           <Route path="/inventario/ingreso-stock" element={<IngresoStock />} />
+          <Route path="/calidad-datos/certificado" element={<Certificado />} />
         </Routes>
       </SidebarInset>
     </SidebarProvider>

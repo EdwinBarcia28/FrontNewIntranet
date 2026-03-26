@@ -1,10 +1,9 @@
-import { CardWithFormIngreso } from "@/components/Inventario/Ingreso/CardWithFormIngreso";
-//import { CardWithFormSearchIngreso } from "@/components/Inventario/Ingreso/CardWithFormSearchIngreso";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CardWithFormCertificados } from "@/components/Certificados/CardWithFormCertificados";
 
-export default function IngresoStock() {
+export default function Certificado() {
   return (
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
@@ -23,20 +22,14 @@ export default function IngresoStock() {
           />
 
           {/* Tabs */}
-          <Tabs defaultValue="consultar" className="w-[400px] sm:w-[1300px]">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="consultar">
-                Consultar Ingreso Stock 
-              </TabsTrigger>
-              <TabsTrigger value="ingreso">
-                Registrar Ingreso Stock
+          <Tabs defaultValue="defuncion" className="w-[400px] sm:w-[1300px]">
+            <TabsList className="grid w-full grid-cols-1">
+              <TabsTrigger value="defuncion">
+                Consultar certificados 
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="ingreso">
-              <CardWithFormIngreso />
-            </TabsContent>
-            <TabsContent value="consultar">
-              <CardWithFormIngreso />
+            <TabsContent value="defuncion">
+              <CardWithFormCertificados />
             </TabsContent>
           </Tabs>
         </div>
