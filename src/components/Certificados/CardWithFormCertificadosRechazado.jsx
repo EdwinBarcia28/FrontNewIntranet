@@ -19,10 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DataTableCertificados } from "./DataTableCertificados";
-import { certificadoRequest, searchCertificadoRequest } from "@/services/certificado";
+import { certificadoRequestRechazado, searchCertificadoRechazadoRequest} from "@/services/certificado";
+import { DataTableCertificadosRechazado } from "./DataTableCertificadosRechazado";
 
-export const CardWithFormCertificados = () => {
+export const CardWithFormCertificadosRechazado = () => {
 
   //const [filterSearch, setFilterSearch] = useState("1");
 
@@ -48,18 +48,18 @@ export const CardWithFormCertificados = () => {
   //   await handleBuscarRegister(new Event("refresh")); // simula la búsqueda
   // };
 
-  const refreshDocument = async () => {
-    if (
-      searchCertificadoRegister !== "" ||
-      fechaDesde !== "" ||
-      fechaHasta !== ""
-    ) {
-      await handleBuscarRegister(new Event("refresh"));
-    } else {
-      await fetchDataCertificado(token);
-    }
+//   const refreshDocument = async () => {
+//     if (
+//       searchCertificadoRegister !== "" ||
+//       fechaDesde !== "" ||
+//       fechaHasta !== ""
+//     ) {
+//       await handleBuscarRegister(new Event("refresh"));
+//     } else {
+//       await fetchDataCertificado(token);
+//     }
 
-  };
+//   };
 
 
   const [loadingReceiptRegister, setLoadingReceiptRegister] = useState(false);
@@ -91,7 +91,7 @@ export const CardWithFormCertificados = () => {
 
   const fetchDataCertificado = useCallback(async (token) => {
     try {
-      const responseService = await certificadoRequest(token);
+      const responseService = await certificadoRequestRechazado(token);
       if (responseService == null) {
         return toast.error(
           "Comunicacion con el Servidor , se dio de forma interrumpida",
@@ -172,7 +172,7 @@ export const CardWithFormCertificados = () => {
 
     console.log(requestComprobante);
 
-    const responseReceipt = await searchCertificadoRequest(requestComprobante, token)
+    const responseReceipt = await searchCertificadoRechazadoRequest(requestComprobante, token)
 
     if (responseReceipt === null || responseReceipt === undefined) {
       return toast.error(
@@ -222,9 +222,9 @@ export const CardWithFormCertificados = () => {
   return (
     <Card className="w-full px-4 md:px-8">
       <CardHeader>
-        <CardTitle>Consulta de certificados</CardTitle>
+        <CardTitle>Consulta de certificados rechazados</CardTitle>
         <CardDescription>
-          En esta opción podra consultar los certificados pendientes de revision , para indicar si se procede con dicho certificado o se rechaza
+          En esta opción podra consultar los certificados que fueron rechazados y enviada la respuesta al usuario
         </CardDescription>
 
         <br />
@@ -329,7 +329,7 @@ export const CardWithFormCertificados = () => {
 
       <CardContent className="overflow-x-auto">
         {/* onRefresh={refreshDocument} */}
-        <DataTableCertificados data={dataCertificadoBandejaRegister} onRefresh={refreshDocument} />
+        <DataTableCertificadosRechazado data={dataCertificadoBandejaRegister}  />
       </CardContent>
     </Card>
   );

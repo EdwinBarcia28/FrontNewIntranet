@@ -3,9 +3,9 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   //Prueba
-  //baseURL: "https://localhost:7111/api/",
+  baseURL: "https://localhost:7111/api/",
   //Produccion
-  baseURL: "http://01srv242b:8082/api/",
+  //baseURL: "http://01srv242b:8082/api/",
   withCredentials: false,
 });
 

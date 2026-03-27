@@ -2,6 +2,8 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CardWithFormCertificados } from "@/components/Certificados/CardWithFormCertificados";
+import { CardWithFormCertificadosAprobado } from "@/components/Certificados/CardWithFormCertificadosAprobado";
+import { CardWithFormCertificadosRechazado } from "@/components/Certificados/CardWithFormCertificadosRechazado";
 
 export default function Certificado() {
   return (
@@ -22,14 +24,26 @@ export default function Certificado() {
           />
 
           {/* Tabs */}
-          <Tabs defaultValue="defuncion" className="w-[400px] sm:w-[1300px]">
-            <TabsList className="grid w-full grid-cols-1">
-              <TabsTrigger value="defuncion">
-                Consultar certificados 
+          <Tabs defaultValue="pendiente" className="w-[400px] sm:w-[1300px]">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="pendiente">
+                Consultar certificados pendientes
+              </TabsTrigger>
+              <TabsTrigger value="aprobado">
+                Consultar certificados aprobados 
+              </TabsTrigger>
+              <TabsTrigger value="rechazado">
+                Consultar certificados rechazado 
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="defuncion">
+            <TabsContent value="pendiente">
               <CardWithFormCertificados />
+            </TabsContent>
+            <TabsContent value="aprobado">
+              <CardWithFormCertificadosAprobado />
+            </TabsContent>
+            <TabsContent value="rechazado">
+              <CardWithFormCertificadosRechazado />
             </TabsContent>
           </Tabs>
         </div>
